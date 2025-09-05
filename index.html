@@ -2229,16 +2229,37 @@
 
                  // Función para pasar a la siguiente ronda
          function nextRound() {
-             currentRound++;
-             
-             if (currentRound > totalRounds) {
-                 // Mostrar resultados finales
-                 showFinalResults();
-             } else {
-                 // Iniciar nueva ronda
-                 startNewRound();
-             }
-         }
+            currentRound++;
+            
+            if (currentRound > totalRounds) {
+                // Mostrar resultados finales
+                showFinalResults();
+            } else {
+                // Mostrar fase de preparación antes de la nueva ronda
+                const prepEl = document.getElementById('preparation-phase');
+                const prepCountdownEl = document.getElementById('prep-countdown');
+                if (prepEl && prepCountdownEl) {
+                    document.getElementById('result-phase').classList.add('hidden');
+                    prepEl.classList.remove('hidden');
+                    let prepTime = 5;
+                    prepCountdownEl.textContent = `${prepTime}`;
+                    if (window.prepInterval) clearInterval(window.prepInterval);
+                    window.prepInterval = setInterval(() => {
+                        prepTime--;
+                        prepCountdownEl.textContent = `${prepTime}`;
+                        if (prepTime <= 0) {
+                            clearInterval(window.prepInterval);
+                            prepEl.classList.add('hidden');
+                            // Iniciar nueva ronda
+                            startNewRound();
+                        }
+                    }, 1000);
+                } else {
+                    // Fallback si no existe fase de preparación
+                    startNewRound();
+                }
+            }
+        }
          
          // Función para ir al menú principal
          function goToMenu() {
