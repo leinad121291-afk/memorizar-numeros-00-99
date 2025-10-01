@@ -1137,12 +1137,12 @@
             <div class="timer" id="elapsed-time" style="color: #1976d2; font-weight: bold;">Tiempo empleado: 0.0 segundos</div>
             <div class="number-display" id="number-display"></div>
             <div class="progress-indicator" id="progress">Números 1-2 de 5</div>
-            <div style="margin: 20px 0;">
+            <div style="margin: 20px 0;" id="navigation-buttons">
                 <button class="button" id="prev-btn" onclick="previousNumber()" disabled>← Anterior</button>
                 <button class="button" id="next-btn" onclick="nextNumber()">Siguiente →</button>
             </div>
             <p id="memorization-info">Memoriza estos números. Tienes 15 segundos.</p>
-            <div style="margin: 30px 0;">
+            <div style="margin: 30px 0;" id="finish-btn-container">
                 <button class="button" id="finish-memorization-btn" onclick="finishMemorization()">Terminar Memorización</button>
             </div>
         </div>
@@ -1835,7 +1835,46 @@
             const nextShouldBeDisabled = currentNumberIndex + numbersInThisPage >= numberSequence.length;
             
             prevBtn.disabled = prevShouldBeDisabled;
-            nextBtn.disabled = nextShouldBeDisabled;
+            
+            // Manejar botones en última página durante memorización
+            const finishBtn = document.getElementById('finish-memorization-btn');
+            const finishBtnContainer = document.getElementById('finish-btn-container');
+            const navButtons = document.getElementById('navigation-buttons');
+            
+            if (gameState === 'memorization') {
+                if (nextShouldBeDisabled) {
+                    // Última página: ocultar botón siguiente y mover botón terminar
+                    nextBtn.style.display = 'none';
+                    if (finishBtn && navButtons) {
+                        navButtons.appendChild(finishBtn);
+                        finishBtn.style.display = 'inline-block';
+                    }
+                    if (finishBtnContainer) {
+                        finishBtnContainer.style.display = 'none';
+                    }
+                } else {
+                    // Páginas intermedias: mostrar botón siguiente
+                    nextBtn.style.display = 'inline-block';
+                    nextBtn.disabled = false;
+                    // Restaurar botón terminar a su contenedor original
+                    if (finishBtn && finishBtnContainer) {
+                        finishBtnContainer.appendChild(finishBtn);
+                        finishBtn.style.display = 'inline-block';
+                        finishBtnContainer.style.display = 'block';
+                    }
+                }
+            } else {
+                nextBtn.disabled = nextShouldBeDisabled;
+                nextBtn.style.display = 'inline-block';
+                if (finishBtnContainer) {
+                    finishBtnContainer.style.display = 'block';
+                }
+                // Restaurar botón terminar a su contenedor original fuera de memorización
+                if (finishBtn && finishBtnContainer && finishBtn.parentElement !== finishBtnContainer) {
+                    finishBtnContainer.appendChild(finishBtn);
+                    finishBtn.style.display = 'inline-block';
+                }
+            }
             
             console.log('Estado de botones:', {
                 prevDisabled: prevShouldBeDisabled,
@@ -1897,6 +1936,10 @@
                 }
             } else {
                 console.log('No se puede avanzar más - ya estamos en el final');
+                // Si estamos en fase de memorización, terminar
+                if (gameState === 'memorization') {
+                    finishMemorization();
+                }
             }
         }
 
