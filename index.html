@@ -1164,8 +1164,8 @@
             
             <div id="digits-input-container" class="digits-grid"></div>
             <div>
-                <button class="button" onclick="checkAnswer()" id="verify-btn">Verificar Respuesta</button>
                 <button class="button" onclick="showNumberAgain()" id="show-again-btn">Ver de Nuevo</button>
+                <button class="button" onclick="checkAnswer()" id="verify-btn">Verificar Respuesta</button>
             </div>
         </div>
 
@@ -1255,11 +1255,11 @@
                      <div class="progress-fill" id="round-progress-fill"></div>
                  </div>
              </div>
-             <div>
-                 <button class="button" onclick="nextRound()" id="next-round-btn">Siguiente Ronda</button>
-                 <button class="button" onclick="resetGame()" id="new-game-btn">Nuevo Juego</button>
-                 <button class="button" onclick="goToMenu()" id="menu-btn" style="display: none;">Menú</button>
-             </div>
+            <div>
+                <button class="button" onclick="resetGame()" id="new-game-btn">Nuevo Juego</button>
+                <button class="button" onclick="nextRound()" id="next-round-btn">Siguiente Ronda</button>
+                <button class="button" onclick="goToMenu()" id="menu-btn" style="display: none;">Menú</button>
+            </div>
          </div>
          
          <!-- Fase de Resultados Finales -->
@@ -2136,6 +2136,22 @@
                     if (e.key === 'ArrowRight') {
                         e.preventDefault();
                         nextNumber();
+                        return;
+                    }
+                    if (e.key === ' ') { // Barra espaciadora
+                        e.preventDefault();
+                        // Ir a la página 1 (índice 0)
+                        currentNumberIndex = 0;
+                        updateDisplay();
+                        
+                        // Reiniciar timer si estamos en modo autoavance
+                        if (currentMode === 'auto-advance') {
+                            clearInterval(timerInterval);
+                            timer = autoAdvanceTime;
+                            document.getElementById('timer').textContent = `Tiempo restante: ${timer.toFixed(1)} segundos`;
+                            document.getElementById('elapsed-time').textContent = `Tiempo empleado: 0.0 segundos`;
+                            startTimer();
+                        }
                         return;
                     }
                     return; // No procesar otras teclas en memorización
